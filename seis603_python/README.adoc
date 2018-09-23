@@ -1,0 +1,3 @@
+In this folder, you’ll find the components of my final project for SEIS 603 - Foundations of Software Development - Python, taken in Spring 2018 as part of the MS in Data Science curriculum at the University of St. Thomas.
+
+This was a solo project in which students were asked to pick a project to implement in python. I chose to replicate the Gender Guesser, a javascript program that guesses the gender of an author based on a selection of their writing. The original Gender Guesser, coded in javascript, can be found at http://www.hackerfactor.com/GenderGuesser.php.
