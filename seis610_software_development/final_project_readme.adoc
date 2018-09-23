@@ -1,1 +1,1 @@
-In this folder, you'll find the components of my final project for SEIS610 - Software Development, Fall 2017.
+In this folder, you'll find the components of my final project for SEIS 610 - Software Engineering, taken in Fall 2017 as part of the MS in Data Science curriculum at the University of St. Thomas.
