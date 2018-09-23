@@ -12,6 +12,6 @@ heroisms.txt - copy of the first chapter of The Lost World, by Sir Arthur Conan 
 
 playingpilgrims.txt - copy of the first chapter of Little Women, by Louisa May Alcott (F)
 
-If you would like to try the gender guesser with a different type of writing, please copy and paste the text in to a new .txt file and save it in the 603_project_MDARGIS folder. Please note that you may run into issues with the file encoding if you copy and paste something from a highly stylized website; however, writings from Project Gutenberg (www.gutenberg.org) seem to work well.
+If you would like to try the gender guesser with a different type of writing, please copy and paste the text in to a new .txt file and save it in the same folder as GenderGuesser.py. Please note that you may run into issues with the file encoding if you copy and paste something from a highly stylized website; however, writings from Project Gutenberg (www.gutenberg.org) seem to work well.
 
 The gender guesser will exit automatically after analyzing the text. If you would like to try again, or analyze a new text, simply restart the program.
