@@ -5,6 +5,6 @@ Here you'll find a link to my final visualization project for the course SEIS 63
 
 This visualization was created by a three-person team consisting of myself, Louis Garrett, and Naomi Sprague. Our professor, Dr. Manjeet Rege, assigned us to a 'Movies' dataset that contained information on major studio releases between the years 2007 and 2011. Features of the data set include genre, foreign and domestic gross, budge5t, profit, and distribution, among others. We were tasked with exploring the data set and presenting a compelling story to the class. We chose to approach the assignment from the perspective of consultants helping a movie studio with broad investment strategy.
 
-My role on this team consisted of driving the direction of the final story as presented and editing visualizations for detail and consistency. Although the overall story and visualizations are the ones we presented in class, I have edited some parts of the story to include more explanatory text.
+My role on this team focused on driving the direction of the final story as presented and editing visualizations for detail and consistency. Although the overall story and visualizations are the ones we presented in class, I have edited some parts of the story to include more explanatory text.
 
 https://public.tableau.com/views/SEIS632FinalProject-DargisGarrettSprague-2017/Story1?:embed=y&:display_count=yes&publish=yes
