@@ -6,4 +6,4 @@ I chose to work through the stages of software development for a standardized te
 
 The "Documentation" file incldues the final deliverable, an extensive software development plan including business case and risks, user stories, use cases, sequence and class diagrams, and a test plan.
 
-The "User Interface Example" is a powerpoint version of a very rough example of the desired database interface. It can be viewed by downloading the file, then watching in presentation mode in Microsfot PowerPoint.
+The "User Interface Example" is a powerpoint version of a very rough example of the desired database interface. It can be viewed by downloading the file, then watching in presentation mode in Microsoft PowerPoint.
