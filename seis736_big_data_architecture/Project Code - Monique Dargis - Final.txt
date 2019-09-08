@@ -1,0 +1,55 @@
+import org.apache.spark.sql.types._
+val donationsSchema = StructType(Array(StructField("ProjectID",StringType, true),StructField("DonationID",StringType,true),StructField("DonorID",StringType,true),StructField("OptionalDonation",StringType,true),StructField("Amount",FloatType,true),StructField("CartSequence",IntegerType,true),StructField("Date",StringType, true)))
+val donationsDF = sqlContext.read.format("com.databricks.spark.csv").option("header","true").schema(donationsSchema).load("project/Donations.csv")
+case class Donations(ProjectID: String, DonationID: String, DonorID: String, OptionalDonation: String, Amount: Float, CartSequence: Integer, Date: String)
+val donationsDS = donationsDF.as[Donations]
+val Amount = donationsDS.rdd.map(x => (x.Amount))
+Amount.stats
+Amount.reduce(_+_)
+val DonorID_Amount_reduced = donationsDS.rdd.map(x => (x.DonorID, x.Amount)).reduceByKey(_+_)
+val Amount_bydonor = DonorID_Amount_reduced.map{case (x:String, y:Float) => y}
+Amount_bydonor.stats
+val donationDate_Amount = donationsDS.rdd.map(x => (x.Date.split(" "), x.Amount)).map{case(x:Array[String], y:Float) => (x(0),y)}.reduceByKey(_+_).sortByKey(ascending=true).saveAsTextFile("project/donationDate_Amount")
+val donationDate_Count = donationsDS.rdd.map(x => (x.Date.split(" "))).map{case(x:Array[String]) => (x(0), 1)}.reduceByKey(_+_).sortByKey(ascending=true).saveAsTextFile("project/donationDate_Count")
+val donorsSchema = StructType (Array(StructField("DonorID",StringType,true),StructField("City",StringType,true),StructField("State",StringType,true),StructField("IsTeacher",StringType,true),StructField("Zip",StringType,true)))
+val donorsDF = sqlContext.read.format("com.databricks.spark.csv").option("header","true").schema(donorsSchema).load("project/Donors.csv")
+case class Donors(DonorID: String, City: String, State: String, IsTeacher: String, Zip: String)
+val donorsDS = donorsDF.as[Donors]
+val DonorID_IsTeacher = donorsDS.rdd.map(x => (x.DonorID, x.IsTeacher))
+DonorID_IsTeacher.count
+val DonorID_IsTeacher_yes = DonorID_IsTeacher.filter{case (x:String, y:String) => y.contains("Yes")}
+DonorID_IsTeacher_yes.count
+val DonorID_Amount_r_IsTeacher_temp = DonorID_Amount_reduced.leftOuterJoin(DonorID_IsTeacher)
+val DonorID_Amount_r_IsTeacher = DonorID_Amount_r_IsTeacher_temp.map{case(x:String, (y:Float, z: Option[String]))=> (x, (y, (z.getOrElse())))}
+val yes_teacher_amount = DonorID_Amount_r_IsTeacher.filter{ case (x: String, (y:Float, z:Any)) => z.toString.contains("Yes")}.map{case (x:String,(y:Float, z:Any)) => y}.stats
+val no_teacher_amount = DonorID_Amount_r_IsTeacher.filter{ case (x: String, (y:Float, z:Any)) => !(z.toString.contains("Yes"))}.map{case (x:String,(y:Float, z:Any)) => y}.stats
+val DonorID_Amount = donationsDS.rdd.map(x => (x.DonorID, x.Amount))
+val DonorID_Amount_IsTeacher_temp = DonorID_Amount.leftOuterJoin(DonorID_IsTeacher)
+val DonorID_Amount_IsTeacher = DonorID_Amount_IsTeacher_temp.map{case(x:String, (y:Float, z: Option[String]))=> (x, (y, (z.getOrElse())))}
+val yes_teacher_amount_perdonation = DonorID_Amount_IsTeacher.filter{ case (x: String, (y:Float, z:Any)) => z.toString.contains("Yes")}.map{case (x:String,(y:Float, z:Any)) => y}
+yes_teacher_amount_perdonation.stats
+yes_teacher_amount_perdonation.reduce(_+_)
+val no_teacher_amount_perdonation = DonorID_Amount_IsTeacher.filter{ case (x: String, (y:Float, z:Any)) => !(z.toString.contains("Yes"))}.map{case (x:String,(y:Float, z:Any)) => y}
+no_teacher_amount_perdonation.stats
+no_teacher_amount_perdonation.reduce(_+_)
+val OptionalDonation = donationsDS.rdd.map(x => x.OptionalDonation)
+OptionalDonation.filter(x => x.contains("Yes")).count
+val DonorID_OptionalDonation = donationsDS.rdd.map(x => (x.DonorID, x.OptionalDonation))
+val DonorID_OptionalDonation_IsTeacher_temp = DonorID_OptionalDonation.leftOuterJoin(DonorID_IsTeacher)
+val DonorID_OptionalDonation_IsTeacher = DonorID_OptionalDonation_IsTeacher_temp.map{case(x:String, (y:String, z:Option[String])) => (x, (y, (z.getOrElse())))}
+val no_teacher_no_optional = DonorID_OptionalDonation_IsTeacher.filter{ case(x:String, (y:String, z:Any)) => y.contains("No") && !(z.toString.contains("Yes"))}
+no_teacher_no_optional.count
+val yes_teacher_no_optional = DonorID_OptionalDonation_IsTeacher.filter{ case(x:String, (y:String, z:Any)) => y.contains("No") && (z.toString.contains("Yes"))}
+yes_teacher_no_optional.count
+val no_teacher_yes_optional = DonorID_OptionalDonation_IsTeacher.filter{ case(x:String, (y:String, z:Any)) => y.contains("Yes") && !(z.toString.contains("Yes"))}
+no_teacher_yes_optional.count
+val yes_teacher_yes_optional = DonorID_OptionalDonation_IsTeacher.filter{ case(x:String, (y:String, z:Any)) => y.contains("Yes") && (z.toString.contains("Yes"))}
+yes_teacher_yes_optional.count
+val projectsSchema = StructType(Array(StructField("ProjectID",StringType,true),StructField("SchoolID",StringType,true),StructField("TeacherID",StringType,true),StructField("Sequence",IntegerType,true),StructField("ProjectType",StringType,true),StructField("Title",StringType,true),StructField("Essay",StringType,true),StructField("ShortDescription",StringType,true),StructField("NeedStatement",StringType,true),StructField("SubjectCategory",StringType,true),StructField("SubjectSubcategory",StringType,true),StructField("GradeLevel",StringType,true),StructField("ResourceCategory",StringType,true),StructField("Cost",FloatType,true),StructField("PostedDate",StringType,true),StructField("ExpirationDate",StringType,true),StructField("CurrentStatus",StringType,true),StructField("FullyFundedDate",StringType,true)))
+val projectsDF = sqlContext.read.format("com.databricks.spark.csv").option("header","true").option("mode","DROPMALFORMED").schema(projectsSchema).load("project/Projects.csv")
+case class Projects(ProjectID: String, SchoolID: String, TeacherID: String, Sequence: String, ProjectType: String, Title: String, Essay: String, ShortDescription: String, NeedStatement: String, SubjectCategory: String, SubjectSubcategory: String, GradeLevel: String, ResourceCategory: String, Cost: Float, PostedDate: String, ExpirationDate: String, CurrentStatus: String, FullyFundedDate: String)
+val projectsDS = projectsDF.as[Projects]
+val projectsEssay_Status = projectsDS.rdd.map(x => (x.Essay, x.CurrentStatus))
+projectsEssay_Status.count
+val projectsWC_Funded = projectsEssay_Status.filter{case (x:String,y:String) => y.contains("Fully Funded")}.map{case(x:String,y:String) => x}.flatMap{case (x:String) => x.split("\\W+")}.filter{case (x:String) => !(x.contains("DONOTREMOVEESSAYDIVIDER"))}.filter(_.length!=0).filter(_(0).isLetter).map(x => (x.toLowerCase, 1)).reduceByKey(_+_).sortBy(-_._2).saveAsTextFile("project/projectsWC_Funded")
+val projectsWC_NotFunded = projectsEssay_Status.filter{case (x:String,y:String) => !(y.contains("Fully Funded"))}.map{case(x:String,y:String) => x}.flatMap{case (x:String) => x.split("\\W+")}.filter{case (x:String) => !(x.contains("DONOTREMOVEESSAYDIVIDER"))}.filter(_.length!=0).filter(_(0).isLetter).map(x => (x.toLowerCase, 1)).reduceByKey(_+_).sortBy(-_._2).saveAsTextFile("project/projectsWC_NotFunded")
